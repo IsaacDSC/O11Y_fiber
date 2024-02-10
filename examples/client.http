@@ -1,0 +1,10 @@
+###
+GET http://localhost:3000/error
+
+
+###
+GET http://localhost:3000/users/123
+
+
+###
+GET http://localhost:3000/timeout
