@@ -15,9 +15,7 @@ import (
 
 	o11yfiber "github.com/IsaacDSC/O11Y_fiber"
 	"github.com/gofiber/fiber/v2"
-
 	"go.opentelemetry.io/otel/attribute"
-
 	oteltrace "go.opentelemetry.io/otel/trace"
 )
 
@@ -58,5 +56,6 @@ func getUser(ctx context.Context, id string) string {
 	}
 	return "unknown"
 }
+
 
 ```
