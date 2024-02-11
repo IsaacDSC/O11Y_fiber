@@ -2,9 +2,11 @@ package o11yfiber
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 
+	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/gofiber/contrib/otelfiber"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/recover"
@@ -51,10 +53,11 @@ type Handler struct {
 }
 
 type SettingsHttp struct {
-	TracerProvider *sdktrace.TracerProvider
-	Handlers       []Handler
-	Middleware     []func(c *fiber.Ctx) error
-	ServerPort     int
+	TracerProvider     *sdktrace.TracerProvider
+	Handlers           []Handler
+	Middleware         []func(c *fiber.Ctx) error
+	ServerPort         int
+	ServiceNameMetrics string
 }
 
 func StartServerHttp(config SettingsHttp) error {
@@ -70,8 +73,17 @@ func StartServerHttp(config SettingsHttp) error {
 		config.ServerPort = 3000
 	}
 
+	if config.ServiceNameMetrics == "" {
+		return errors.New(NOT_FOUND_SERVICE_NAME_METRICS)
+	}
+
 	server := fiber.New()
+
+	prometheus := fiberprometheus.New(config.ServiceNameMetrics)
+	prometheus.RegisterAt(server, "/metrics")
+
 	server.Use(recover.New())
+	server.Use(prometheus.Middleware)
 
 	if config.TracerProvider != nil {
 		server.Use(otelfiber.Middleware())
