@@ -15,13 +15,16 @@ import (
 	oteltrace "go.opentelemetry.io/otel/trace"
 )
 
+const serviceName = "minimal-api"
+
 func main() {
 	tp := o11yfiber.StartTracing(o11yfiber.TracingConfig{
 		EndpointCollector: "http://localhost:14268/api/traces",
-		ServiceNameKey:    "minimal-api",
+		ServiceNameKey:    serviceName,
 	})
 	log.Fatal(o11yfiber.StartServerHttp(o11yfiber.SettingsHttp{
-		TracerProvider: tp,
+		ServiceNameMetrics: serviceName,
+		TracerProvider:     tp,
 		Handlers: []o11yfiber.Handler{
 			{HandlerFunc: handleUser, Path: "/users/:id", Method: o11yfiber.GET},
 			{HandlerFunc: handleError, Path: "/error", Method: o11yfiber.GET},
@@ -33,7 +36,7 @@ func main() {
 				AllowHeaders: "Origin, Content-Type, Accept",
 				AllowMethods: "*",
 			}),
-			o11yfiber.MiddlewareIO,
+			o11yfiber.MiddlewareIO("/error", "/api/live/ws"),
 		},
 		ServerPort: 3000,
 	}))
