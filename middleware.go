@@ -45,7 +45,7 @@ func MiddlewareIO(ignorePaths ...string) func(c *fiber.Ctx) error {
 			return err
 		}
 
-		l.Log(ctx, slog.LevelError, "Response",
+		l.Log(ctx, slog.LevelInfo, "Response",
 			"correlation_id", correlationID,
 			"request_id", requestID,
 			"status_code", c.Response().StatusCode(),
