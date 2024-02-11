@@ -4,7 +4,6 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"log"
 
 	"github.com/ansrivas/fiberprometheus/v2"
 	"github.com/gofiber/contrib/otelfiber"
@@ -61,10 +60,13 @@ type SettingsHttp struct {
 }
 
 func StartServerHttp(config SettingsHttp) error {
+	logger := NewLogger()
 	defer func() {
 		if config.TracerProvider != nil {
 			if err := config.TracerProvider.Shutdown(context.Background()); err != nil {
-				log.Printf("Error shutting down tracer provider: %v", err)
+				logger.Error(SHUTTING_DOWN_TRACER_PROVIDER,
+					"error", err.Error(),
+				)
 			}
 		}
 	}()
